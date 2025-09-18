@@ -16,7 +16,7 @@ exports.createlogin= async (req, res) => {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, Deno.env.JWT_SECRET, {
       expiresIn: "8h",
     });
     res.json({ token });
