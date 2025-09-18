@@ -1,3 +1,4 @@
+
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
@@ -11,6 +12,8 @@ exports.createlogin= async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
+
+    // Validar password
     const validatePassword = await bcrypt.compare(password, user.password);
     if (!validatePassword) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
@@ -25,6 +28,7 @@ exports.createlogin= async (req, res) => {
   }
 };
 
+
 exports.register= async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -33,15 +37,14 @@ exports.register= async (req, res) => {
       return res.status(409).json({ message: 'El usuario ya existe' });
     }
 
+    // Encriptar password
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = new User({ name, email, password: hashedPassword });
+
     await newUser.save();
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
 };
-
-
-
-
