@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-//const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = Deno.env.get("JWT_SECRET");
 // Rutas
 exports.createlogin= async (req, res) => {
   const { name, password } = req.body;
@@ -16,7 +16,7 @@ exports.createlogin= async (req, res) => {
       return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
-    const token = jwt.sign({ userId: user._id }, Deno.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: "8h",
     });
     res.json({ token });

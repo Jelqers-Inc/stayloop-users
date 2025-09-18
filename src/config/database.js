@@ -1,10 +1,13 @@
 // src/config/database.js
 const mongoose = require('mongoose');
+const MONGO_DB = Deno.env.get('MONGO_DB');
+const MONGO_PASS = Deno.env.get("MONGO_PASS");
+const MONGO_USER = Deno.env.get("MONGO_USER");
 
 const connectDB = async () => {
   try {
     await mongoose.connect(
-      `mongodb+srv://${Deno.env.MONGO_USER}:${Deno.env.MONGO_PASS}@stayloopusers.3alunnv.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`,
+      `mongodb+srv://${MONGO_USER}:${MONGO_PASS}@stayloopusers.3alunnv.mongodb.net/${MONGO_DB}?retryWrites=true&w=majority`,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
