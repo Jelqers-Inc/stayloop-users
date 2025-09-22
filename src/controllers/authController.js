@@ -27,14 +27,31 @@ exports.createlogin = async (req, res) => {
       { 
         userId: user._id,
         email: user.email,
-        idRol: user.idRol
+        idRol: user.idRol,
+        nombre: user.nombre,
+        status: user.status
       }, 
       process.env.JWT_SECRET, 
       {
         expiresIn: "8h",
       }
     );
-    res.json({ token });
+    
+    // Crear URL para la imagen del usuario
+    const imageUrl = `/api/users/image/${user._id}`;
+    
+    // Enviar respuesta con datos del usuario y token
+    res.json({ 
+      token,
+      user: {
+        id: user._id,
+        nombre: user.nombre,
+        email: user.email,
+        idRol: user.idRol,
+        status: user.status,
+        imageUrl: imageUrl
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
@@ -66,8 +83,38 @@ exports.register = async (req, res) => {
       imgUsuario: req.file.buffer
     });
 
-    await newUser.save();
-    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+    const savedUser = await newUser.save();
+
+    // Crear URL para la imagen del usuario
+    const imageUrl = `/api/users/image/${savedUser._id}`;
+    
+    // Generar token para autologin después del registro
+    const token = jwt.sign(
+      { 
+        userId: savedUser._id,
+        email: savedUser.email,
+        idRol: savedUser.idRol,
+        nombre: savedUser.nombre,
+        status: savedUser.status
+      }, 
+      process.env.JWT_SECRET, 
+      {
+        expiresIn: "8h",
+      }
+    );
+
+    res.status(201).json({ 
+      message: 'Usuario registrado exitosamente',
+      token,
+      user: {
+        id: savedUser._id,
+        nombre: savedUser.nombre,
+        email: savedUser.email,
+        idRol: savedUser.idRol,
+        status: savedUser.status,
+        imageUrl: imageUrl
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error en el servidor', error: error.message });
   }
