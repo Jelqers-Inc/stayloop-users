@@ -2,7 +2,7 @@ const User = require('../models/user');
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find({}, { imgUsuario: 0 }); // Exclude imgUsuario field
     res.json(users);
   } catch (error) {
     res
@@ -13,7 +13,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id, { imgUsuario: 0 }); // Exclude imgUsuario by default
     if (!user) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
@@ -25,11 +25,42 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+// New endpoint to get user's image
+exports.getUserImage = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id, { imgUsuario: 1 });
+    if (!user || !user.imgUsuario) {
+      return res.status(404).json({ message: 'Imagen de usuario no encontrada' });
+    }
+    res.set('Content-Type', 'image/jpeg'); // Adjust content type as needed
+    res.send(user.imgUsuario);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error al obtener la imagen del usuario", error: error.message });
+  }
+};
+
 exports.createUser = async (req, res) => {
   try {
-    const newUser = new User(req.body);
+    if (!req.file) {
+      return res.status(400).json({ message: 'La imagen del usuario es obligatoria' });
+    }
+
+    const userData = {
+      ...req.body,
+      imgUsuario: req.file.buffer,
+      status: 1 // Por defecto activo
+    };
+
+    const newUser = new User(userData);
     const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
+    
+    // Remove the imgUsuario from the response to avoid large payload
+    const userResponse = savedUser.toObject();
+    delete userResponse.imgUsuario;
+    
+    res.status(201).json(userResponse);
   } catch (error) {
     res
       .status(500)
@@ -39,11 +70,28 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updateData = { ...req.body };
+    
+    // If there's a new image, update it
+    if (req.file) {
+      updateData.imgUsuario = req.file.buffer;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id, 
+      updateData,
+      { new: true, runValidators: true }
+    );
+
     if (!updatedUser) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
-    res.json(updatedUser);
+
+    // Remove the imgUsuario from the response
+    const userResponse = updatedUser.toObject();
+    delete userResponse.imgUsuario;
+
+    res.json(userResponse);
   } catch (error) {
     res.status(500).json({ message: 'Error al actualizar el usuario', error: error.message });
   }
