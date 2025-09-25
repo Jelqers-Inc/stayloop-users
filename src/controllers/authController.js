@@ -38,7 +38,7 @@ exports.createlogin = async (req, res) => {
     );
     
     // Crear URL para la imagen del usuario
-    const imageUrl = `/api/users/image/${user._id}`;
+    const imageUrl = `/users/image/${user._id}`;
     
     // Enviar respuesta con datos del usuario y token
     res.json({ 
