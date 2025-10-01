@@ -42,16 +42,30 @@ exports.getUserImage = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'La imagen del usuario es obligatoria' });
-    }
+  const { nombre, email, password, idRol } = req.body;
+    try {
+      // Verificar si ya existe un usuario con ese email
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(409).json({ message: 'Ya existe un usuario con ese email' });
+      }
+  
+      if (!req.file) {
+        return res.status(400).json({ message: 'La imagen del usuario es obligatoria' });
+      }
+  
+      // Encriptar password
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const userData = new User({
+        nombre,
+        email,
+        password: hashedPassword,
+        idRol,
+        status: 1, // Por defecto activo
+        imgUsuario: req.file.buffer
+      });
 
-    const userData = {
-      ...req.body,
-      imgUsuario: req.file.buffer,
-      status: 1 // Por defecto activo
-    };
 
     const newUser = new User(userData);
     const savedUser = await newUser.save();
