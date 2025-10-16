@@ -119,7 +119,7 @@
     "wrappy": "^1.0.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "nodemon server.js"
   },
   "repository": {
@@ -132,5 +132,9 @@
   "bugs": {
     "url": "https://github.com/That-Shele/stayloop-users/issues"
   },
-  "homepage": "https://github.com/That-Shele/stayloop-users#readme"
+  "homepage": "https://github.com/That-Shele/stayloop-users#readme",
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
+  }
 }
