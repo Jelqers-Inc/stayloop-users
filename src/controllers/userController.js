@@ -51,9 +51,7 @@ exports.createUser = async (req, res) => {
         return res.status(409).json({ message: 'Ya existe un usuario con ese email' });
       }
   
-      if (!req.file) {
-        return res.status(400).json({ message: 'La imagen del usuario es obligatoria' });
-      }
+      
   
       // Encriptar password
       const hashedPassword = await bcrypt.hash(password, 10);
