@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema({
   },
   imgUsuario: {
     type: Buffer,
+    required: false,
     validate: {
       validator: function(v) {
         return v.length <= 2097152; // 2MiB in bytes

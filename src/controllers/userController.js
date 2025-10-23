@@ -62,7 +62,7 @@ exports.createUser = async (req, res) => {
         password: hashedPassword,
         idRol,
         status: 1, // Por defecto activo
-        imgUsuario: req.file.buffer
+        imgUsuario: req.file ? req.file.buffer : ""
       });
 
 
