@@ -13,7 +13,7 @@ connectDB();     // conecta a MongoDB
 
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4001;
 const hostname = process.env.HOSTNAME || 'localhost';
 
 // Configuración de CORS
